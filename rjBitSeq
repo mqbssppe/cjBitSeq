@@ -1,0 +1,131 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+  then
+	echo "No arguments supplied"
+	echo "Display usage info: rjBitSeq --help"
+	exit 0
+fi
+
+if [ $1 == C ]
+then
+	echo "ERROR: Two sets of files should be provided, separated by C"
+	echo "Display usage info: rjBitSeq --help"
+	echo "exiting."
+	exit 0
+fi
+
+if [ $1 == --help ]
+then
+	echo ""
+	echo ".............................................................................................."
+	echo ". Usage: rjBitSeq <outputDir> <.prob files condition A> C <.prob files condition B>          ."
+	echo ".                                                                                            ."
+	echo ". Reversible Jump algorithm for Differential Expression analysis                             ."	
+	echo ".                                                                                            ."
+	echo ". Arguments:                                                                                 ."
+	echo ".    <outputDir>: Name of the output directory.                                              ."
+	echo ".                                                                                            ."
+	echo ".    <.prob files condition A>: Space-separated list of '.prob' files for the first sample.  ."
+	echo ".                                                                                            ."
+	echo ".    <.prob files condition B>: Space-separated list of '.prob' files for the second sample. ."
+	echo ".                                                                                            ."
+	echo ". Note: '.prob' files contain alignment probabilities for each read                          ."
+	echo ".       and they are computed using the 'parseAlignment' command of Bitseq.                  ."
+	echo ".                                                                                            ."
+	echo ". Detailed documentation and examples: https://github.com/mqbssppe/rjBitSeq-1.0/wiki         ."
+	echo ".............................................................................................."
+	echo ""
+	exit 0
+fi
+
+if test -d $1; then echo "Directory exists! Please provide different name."; exit 0; fi
+
+mkdir $1
+CWD=$(pwd)
+echo "output written to $CWD/$1"
+a=`expr 1`
+b=`expr 0`
+c=`expr 2`
+
+
+echo "First condition files:"
+for i in $*
+do
+	if [ $i == $1 ]
+	then
+		a=`expr 2`
+	fi
+	if [ $a -eq 1 ]
+	then
+		if [ $i == C ]
+		then
+			a=`expr 2`
+			c=`expr 1`
+		else
+			b=$((b+1))
+			echo "	: $i, $b"
+			if [ ! -f $i ]; then
+				echo "ERROR: File not found!"
+				echo "exiting."
+				echo "Display usage info: rjBitSeq --help"
+				exit 0
+			fi
+			cd $1
+			ln -s ../$i conditionA_$b.prob
+			cd ..
+		fi
+	fi
+	if [ $i == $1 ]
+	then
+		a=`expr 1`
+	fi
+done
+a=`expr 1`
+b=`expr 0`
+echo "Second condition files:"
+for i in $*
+do
+	if [ $i == C ]
+	then
+		a=`expr 2`
+		c=`expr 1`
+	fi
+	if [ $a -eq 2 ]
+	then
+		if [ $i != C ]
+		then
+			b=$((b+1))
+			echo "	: $i, $b"
+			if [ ! -f $i ]; then
+				echo "ERROR: File not found!"
+				echo "Display usage info: rjBitSeq --help"
+				echo "exiting."
+				exit 0
+			fi
+			cd $1
+			ln -s ../$i conditionB_$b.prob
+			cd ..
+		fi
+	fi
+done
+
+if [ $c -eq 2 ]
+then
+	echo "ERROR: Two sets of files should be provided, separated by C"
+	echo "Display usage info: rjBitSeq --help"
+	echo "exiting."
+	exit 0
+fi
+
+cd $1
+cpThis.bash
+echo "computing clusters (output written to $CWD/$1/partitionMerge2.Rout)"
+time R CMD BATCH partitionMerge2.R
+echo "done!"
+echo "Running Reversible Jump using parallel GNU"
+time ./parallelGNU.bash
+echo "Done!"
+echo "Estimates written to $CWD/$1/estimates.txt"
+
+exit 0
