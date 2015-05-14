@@ -57,8 +57,11 @@ system("rm -r clusters")
 system("rm *.panos *.prob *.temp Clusters.txt maxK1 maxK2")
 setwd("../")
 
-thetaFinal <- thetaFinal/sum(thetaFinal)
-wFinal <- wFinal/sum(wFinal)
+thetaFiniteIndex <- which(is.finite(thetaFinal) == TRUE)
+wFiniteIndex <- which(is.finite(wFinal) == TRUE)
+
+thetaFinal[thetaFiniteIndex] <- thetaFinal[thetaFiniteIndex]/sum(thetaFinal[thetaFiniteIndex])
+wFinal[wFiniteIndex] <- wFinal[wFiniteIndex]/sum(wFinal[wFiniteIndex])
 ramones <- cbind(log(thetaFinal),log(wFinal),deFinal)
 
 sigTranscripts1 <- sigTranscripts2 <- sigTranscripts3 <- rep("non-DE",K)

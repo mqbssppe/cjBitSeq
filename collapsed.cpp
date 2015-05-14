@@ -600,6 +600,9 @@ int main()
 		vector<double> cDist (2,0.0);
 		tot_sum1 = r[0]/papasA[0] + s[0]/papasB[0] + K;
 		tot_sum2 = r[0]/papasA[0] + K;
+		vector<int> componentsIndex(K-2);
+
+		
 		//cout << tot_sum1 << ", " << tot_sum2 <<endl;
 		sample1 = 1;
 		sample2 = 1; 
@@ -608,24 +611,50 @@ int main()
 			//cout << iter <<endl;
 			allocateCollapsed(sample1, sample2);	// generate allocations (and compute c_sum) 
 			permutation_current_collapsed();
-			for (k = 1; k < K - 1; k++){
-				//k = 1 + rand() % (K-2);
-				for (i = 0; i < K; i++){
-					c_new[i] = c_vec[i];
-				}
-				uni = unifRand();
-				c_new[k] = 0;
-				cDist[0] = log_f_c_new() + log(1.0-gPrior);
-				c_new[k] = 1;
-				cDist[1] = log_f_c_new() + log(gPrior);
-				cDist[0] = 1.0/(1.0 + exp(cDist[1] - cDist[0]));
-				//cout << cDist[0] << endl;
-				if(uni < cDist[0]){
-					c_vec[k] = 0;
-					}else{
-					c_vec[k] = 1;
-				}
 
+			if (K < 20){
+				for (k = 1; k < K - 1; k++){
+					//k = 1 + rand() % (K-2);
+					for (i = 0; i < K; i++){
+						c_new[i] = c_vec[i];
+					}
+					uni = unifRand();
+					c_new[k] = 0;
+					cDist[0] = log_f_c_new() + log(1.0-gPrior);
+					c_new[k] = 1;
+					cDist[1] = log_f_c_new() + log(gPrior);
+					cDist[0] = 1.0/(1.0 + exp(cDist[1] - cDist[0]));
+					//cout << cDist[0] << endl;
+					if(uni < cDist[0]){
+						c_vec[k] = 0;
+						}else{
+						c_vec[k] = 1;
+					}
+
+				}
+			}else{
+				for (k = 0; k < K - 2; k++) componentsIndex[k] = k + 1; // 1 2 ... K - 2
+				random_shuffle ( componentsIndex.begin(), componentsIndex.end() ); //random permutation
+				// update first 5 elements of random permutation
+				for (j = 0; j < 5; j++){
+					k = componentsIndex[j];
+					for (i = 0; i < K; i++){
+						c_new[i] = c_vec[i];
+					}
+					uni = unifRand();
+					c_new[k] = 0;
+					cDist[0] = log_f_c_new() + log(1.0-gPrior);
+					c_new[k] = 1;
+					cDist[1] = log_f_c_new() + log(gPrior);
+					cDist[0] = 1.0/(1.0 + exp(cDist[1] - cDist[0]));
+					//cout << cDist[0] << endl;
+					if(uni < cDist[0]){
+						c_vec[k] = 0;
+						}else{
+						c_vec[k] = 1;
+					}
+
+				}				
 			}
 			c_sum = 0;
 			for (k = 0; k < K; k++){
@@ -636,7 +665,7 @@ int main()
 //			Update gPrior:
 			gPrior = beta_rand(c_sum + 0.5, K - c_sum + 0.5);
 			//gPrior = 0.99;
-			t_end = omp_get_wtime( );
+			
 			if (iter % saveStep == 0){
 				if(iter > myBurn){
 					nIterations++;
@@ -706,6 +735,7 @@ int main()
 				theta_out << endl;
 				w_out << endl;
 				if (iter % 1000 == 0){
+					t_end = omp_get_wtime( );
 					cout << "Iteration " << iter <<": RJ rate = "<<setprecision(3)<<100.0*rj_rate/iter <<"%, time: "<< setprecision(5)<< t_end - t_start<<" sec."<< "\n\n";
 					cout << sum_1[0] << ", " << sum_2[0]<<"\n";
 				}

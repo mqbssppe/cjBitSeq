@@ -28,7 +28,7 @@ nCon <- 110
 filesA <- list.files(pattern="conditionA")
 filesB <- list.files(pattern="conditionB")
 
-maxDistance <- 100
+maxDistance <- 500
 minThreshold <- -720
 
 foreach(fileIndex=1:2) %dopar% {
