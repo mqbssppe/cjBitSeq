@@ -415,7 +415,7 @@ int main()
 	}
 
 
-	//if (K > 200){ numberChains = 2; }
+	if (K > 200){ numberChains = 2; }
 
         ofstream ar_out ( ar_file.data() );
 
