@@ -73,6 +73,8 @@ do
 			fi
 			cd $1
 			ln -s ../$i conditionA_$b.prob
+			sed '3d' conditionA_$b.prob > tmpfile
+			mv tmpfile conditionA_$b.prob
 			cd ..
 		fi
 	fi
@@ -105,6 +107,8 @@ do
 			fi
 			cd $1
 			ln -s ../$i conditionB_$b.prob
+			sed '3d' conditionB_$b.prob > tmpfile
+			mv tmpfile conditionB_$b.prob
 			cd ..
 		fi
 	fi
