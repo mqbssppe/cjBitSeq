@@ -336,7 +336,7 @@ proc.time() - ptm
 #######################################################################################################
 
 
-lowThreshold <- 2
+lowThreshold <- 100
 smallClusters <- names(which(apply(newReadsPerReplicate,1,min)<lowThreshold))
 smallClusters <- smallClusters[-1] # exclude the empty transcripts
 sum(readsPerReplicate[smallClusters,]) # this is the number of observations assigned to smallClusters
