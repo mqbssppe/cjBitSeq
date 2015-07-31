@@ -8,3 +8,7 @@ Clusterwise Joint BitSeq for Differential Expression Analysis and transcript exp
     * https://github.com/mqbssppe/cjBitSeq/wiki
 * Benchmarking experiments using drosophila and human annotations:
     * https://github.com/ManchesterBioinference/cjBitSeq_benchmarking
+
+# Contact
+
+For direct contact, please contact Panagiotis Papastamoulis (panagiotis.papastamoulis [at] manchester.ac.uk)
