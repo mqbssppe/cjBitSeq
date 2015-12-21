@@ -6,7 +6,7 @@ Clusterwise Joint BitSeq for Differential Expression Analysis and transcript exp
     * Run make inside this directory.
 * Detailed documentation:
     * https://github.com/mqbssppe/cjBitSeq/wiki
-* Benchmarking experiments using drosophila and human annotations:
+* cjBitSeq benchmarking experiments (drosophila and human annotations)
     * https://github.com/ManchesterBioinference/cjBitSeq_benchmarking
 
 # Contact
