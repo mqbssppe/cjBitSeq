@@ -1,0 +1,168 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+  then
+        echo "No arguments supplied"
+        echo "Display usage info: cjBitSeqWithinGene --help"
+        exit 0
+fi
+
+if [ $1 == C ]
+then
+        echo "ERROR: Two sets of files should be provided, separated by C"
+        echo "Display usage info: cjBitSeqWithinGene --help"
+        echo "exiting."
+        exit 0
+fi
+
+if [ $1 == --help ]
+then
+        echo ""
+        echo "........................................................................................................................."
+        echo ". Usage: cjBitSeqWithinGene <outputDir> <geneToTrFile> <nCores> <.prob files condition A> C <.prob files condition B>   ."
+        echo ".                                                                                                              	      ."
+        echo ". Collapsed Gibbs algorithm for Differential Transcript Usage analysis                                                  ." 
+        echo ".                                                                                                                       ."
+        echo ". Arguments:                                                                                                            ."
+        echo ".    <outputDir>: Name of the output directory.                                                                         ."
+        echo ".                                                                                                                       ."
+        echo ".    <geneToTrFile>: File containing gene to transcripts information.                                                   ."
+        echo ".                                                                                                                       ."
+        echo ".    <nCores>: Number of parallel threads to use (at least 4, but 8 or 12 is strongly suggested).                       ."
+        echo ".                                                                                                                       ."
+        echo ".    <.prob files condition A>: Space-separated list of '.prob' files for the first sample.                             ."
+        echo ".                                                                                                                       ."
+        echo ".    <.prob files condition B>: Space-separated list of '.prob' files for the second sample.                            ."
+        echo ".                                                                                                                       ."
+        echo ". Note: '.prob' files contain alignment probabilities for each read                                                     ."
+        echo ".       and they are computed using the 'parseAlignment' command of Bitseq.                                             ."
+        echo ".                                                                                                                       ."
+        echo ". Detailed documentation and examples: https://github.com/mqbssppe/cjBitSeq/wiki/DTU-inference                          ."
+        echo "........................................................................................................................."
+        echo ""
+        exit 0
+fi
+
+if test -d $1; then echo "Directory exists! Please provide different name."; exit 0; fi
+
+mkdir $1
+CWD=$(pwd)
+echo "output written to $CWD/$1"
+a=`expr 1`
+b=`expr 0`
+c=`expr 2`
+
+
+echo "First condition files:"
+for i in $*
+do
+        if [ $i == $1 ]
+        then
+                a=`expr 2`
+        fi
+
+        if [ $i == $2 ]
+        then
+                a=`expr 2`
+                cp $i $1/genesTranscripts.txt
+                echo "transcript and gene info file: $i"
+        fi
+
+        if [ $i == $3 ]
+        then
+                a=`expr 2`
+                echo "Number of cores: $i"
+		> $1/nCores.txt && echo "$i" > $1/nCores.txt
+        fi
+
+
+
+        if [ $a -eq 1 ]
+        then
+                if [ $i == C ]
+                then
+                        a=`expr 2`
+                        c=`expr 1`
+                else
+                        b=$((b+1))
+                        echo "  : $i, $b"
+                        if [ ! -f $i ]; then
+                                echo "ERROR: File not found!"
+                                echo "exiting."
+                                echo "Display usage info: cjBitSeqWithinGene --help"
+                                exit 0
+                        fi
+                        cd $1
+                        ln -s ../$i conditionA_$b.prob
+                        cd ..
+                fi
+        fi
+        if [ $i == $1 ]
+        then
+                a=`expr 1`
+        fi
+        if [ $i == $2 ]
+        then
+                a=`expr 1`
+        fi
+        if [ $i == $3 ]
+        then
+                a=`expr 1`
+        fi
+done
+a=`expr 1`
+b=`expr 0`
+echo "Second condition files:"
+for i in $*
+do
+	if [ $i == C ]
+	then
+		a=`expr 2`
+		c=`expr 1`
+	fi
+	if [ $a -eq 2 ]
+	then
+		if [ $i != C ]
+		then
+			b=$((b+1))
+			echo "	: $i, $b"
+			if [ ! -f $i ]; then
+				echo "ERROR: File not found!"
+				echo "Display usage info: cjBitSeqWithinGene --help"
+				echo "exiting."
+				exit 0
+			fi
+			cd $1
+			ln -s ../$i conditionB_$b.prob
+			cd ..
+		fi
+	fi
+done
+
+if [ $c -eq 2 ]
+then
+	echo "ERROR: Two sets of files should be provided, separated by C"
+	echo "Display usage info: cjBitSeqWithinGene --help"
+	echo "exiting."
+	exit 0
+fi
+
+
+cd $1
+cpThisCOLLAPSEDWITHIN.bash
+echo "getting gene information and generating new files (output written to $CWD/$1/partitionMerge2.Rout)"
+time R CMD BATCH partitionMerge2.R
+echo "done!"
+echo "Running Collapsed MCMC using parallel GNU"
+cd tmp/
+time ./parallelGNUwithin.bash
+echo "Done!"
+echo "Estimates written to $CWD/$1/withinGeneEstimates.txt"
+echo "Cleaning..."
+mv getClustersWithin.Rout ../getClustersWithin.Rout
+mv nReads.txt ../nReads.txt
+cd ..
+rm -r tmp
+rm getClustersWithin.R partitionMerge2.R *.prob
+echo "        ...all done."
+exit 0
