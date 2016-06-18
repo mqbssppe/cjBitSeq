@@ -145,7 +145,7 @@ int main()
 
 
 	ifstream inFile, trFile;
-	int i, j, num, k, h, place = 0, step = 0, iter, nan_number = 0, cluster, tid;
+	int i, j, num, k, h, place = 0, step = 0, iter, nan_number = 0, cluster, tid, d_minus_index;
 	double temp, expZero;
 	expZero = threshold;
 	string line, sample;
@@ -614,6 +614,7 @@ int main()
 
 			if (K < 20){
 				for (k = 1; k < K - 1; k++){
+					d_minus_index = c_sum - c_vec[k]; 
 					//k = 1 + rand() % (K-2);
 					for (i = 0; i < K; i++){
 						c_new[i] = c_vec[i];
@@ -623,11 +624,17 @@ int main()
 					cDist[0] = log_f_c_new() + log(1.0-gPrior);
 					c_new[k] = 1;
 					cDist[1] = log_f_c_new() + log(gPrior);
-					cDist[0] = 1.0/(1.0 + exp(cDist[1] - cDist[0]));
+					// Prosoxi: o pollaplasiasmos me d_minus_index isxuei mono otan gamma_prior = 1
+					cDist[0] = 1.0/(1.0 + d_minus_index*exp(cDist[1] - cDist[0]));
 					//cout << cDist[0] << endl;
 					if(uni < cDist[0]){
+						//edw koitaw ti itan to proigoumeno value wste na aukosmeiwsw c_sum
+						//if(c_vec[k] == 0) tote einai idio
+						if(c_vec[k] == 1){c_sum = c_sum - 1;}
 						c_vec[k] = 0;
 						}else{
+						//if(c_vec[k] == 1) tote einai idio
+						if(c_vec[k] == 0){c_sum = c_sum + 1;}					
 						c_vec[k] = 1;
 					}
 
@@ -638,6 +645,7 @@ int main()
 				// update first 5 elements of random permutation
 				for (j = 0; j < 5; j++){
 					k = componentsIndex[j];
+					d_minus_index = c_sum - c_vec[k]; 
 					for (i = 0; i < K; i++){
 						c_new[i] = c_vec[i];
 					}
@@ -646,11 +654,13 @@ int main()
 					cDist[0] = log_f_c_new() + log(1.0-gPrior);
 					c_new[k] = 1;
 					cDist[1] = log_f_c_new() + log(gPrior);
-					cDist[0] = 1.0/(1.0 + exp(cDist[1] - cDist[0]));
+					cDist[0] = 1.0/(1.0 + d_minus_index*exp(cDist[1] - cDist[0]));
 					//cout << cDist[0] << endl;
 					if(uni < cDist[0]){
+						if(c_vec[k] == 1){c_sum = c_sum - 1;}
 						c_vec[k] = 0;
 						}else{
+						if(c_vec[k] == 0){c_sum = c_sum + 1;}
 						c_vec[k] = 1;
 					}
 
