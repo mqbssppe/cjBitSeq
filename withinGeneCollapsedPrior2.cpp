@@ -591,7 +591,8 @@ int main()
 				// upologizw to cConditionalDist gia to (1,1) (thesi 0)
 				c_new[componentsIndex[0]] = 1;
 				c_new[componentsIndex[1]] = 1;
-				cConditionalDist[0] = log_f_c_new() + logPriorConstant;
+				//PROSOXI: to lgamma(...) isxuei mono otan gamma_prior = 1
+				cConditionalDist[0] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 2.0);
 				// upologizw to cConditionalDist gia to (0,0) (thesi 1)
 				c_new[componentsIndex[0]] = 0;
 				c_new[componentsIndex[1]] = 0;
@@ -614,19 +615,19 @@ int main()
 					// upologizw to cConditionalDist gia to (1,1) (thesi 0)
 					c_new[componentsIndex[0]] = 1;
 					c_new[componentsIndex[1]] = 1;
-					cConditionalDist[0] = log_f_c_new() + logPriorConstant;
+					cConditionalDist[0] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 2.0);
 					// upologizw to cConditionalDist gia to (0,1) (thesi 1)
 					c_new[componentsIndex[0]] = 0;
 					c_new[componentsIndex[1]] = 1;
-					cConditionalDist[1] = log_f_c_new() + logPriorConstant;
+					cConditionalDist[1] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 1.0);
 					// upologizw to cConditionalDist gia to (1,0) (thesi 2)
 					c_new[componentsIndex[0]] = 1;
 					c_new[componentsIndex[1]] = 0;
-					cConditionalDist[2] = log_f_c_new() + logPriorConstant;
+					cConditionalDist[2] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 1.0);
 					// upologizw to cConditionalDist gia to (0,0) (thesi 3)
 					c_new[componentsIndex[0]] = 0;
 					c_new[componentsIndex[1]] = 0;
-					cConditionalDist[3] = log_f_c_new() + minuslog2;
+					cConditionalDist[3] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 0.0);
 					uni = unifRand();
 					normalisedDist[0] = 1.0/(1.0 + exp(cConditionalDist[1] - cConditionalDist[0]) + exp(cConditionalDist[2] - cConditionalDist[0]) + exp(cConditionalDist[3] - cConditionalDist[0]));
 					normalisedDist[1] = 1.0/(1.0 + exp(cConditionalDist[0] - cConditionalDist[1]) + exp(cConditionalDist[2] - cConditionalDist[1]) + exp(cConditionalDist[3] - cConditionalDist[1]));
@@ -654,15 +655,15 @@ int main()
 					// upologizw to cConditionalDist gia to (1,1) (thesi 0)
 					c_new[componentsIndex[0]] = 1;
 					c_new[componentsIndex[1]] = 1;
-					cConditionalDist[0] = log_f_c_new() + logPriorConstant;
+					cConditionalDist[0] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 2.0);
 					// upologizw to cConditionalDist gia to (0,1) (thesi 1)
 					c_new[componentsIndex[0]] = 0;
 					c_new[componentsIndex[1]] = 1;
-					cConditionalDist[1] = log_f_c_new() + logPriorConstant;
+					cConditionalDist[1] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 1.0);
 					// upologizw to cConditionalDist gia to (1,0) (thesi 2)
 					c_new[componentsIndex[0]] = 1;
 					c_new[componentsIndex[1]] = 0;
-					cConditionalDist[2] = log_f_c_new() + logPriorConstant;
+					cConditionalDist[2] = log_f_c_new() + logPriorConstant + lgamma(c_sum_restricted + 1.0);
 
 					uni = unifRand();
 					normalisedDist[0] = 1.0/(1.0 + exp(cConditionalDist[1] - cConditionalDist[0]) + exp(cConditionalDist[2] - cConditionalDist[0]));
