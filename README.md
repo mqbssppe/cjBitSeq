@@ -11,4 +11,4 @@ Clusterwise Joint BitSeq for Differential Expression Analysis and transcript exp
 
 # Contact
 
-For direct contact, please contact Panagiotis Papastamoulis (panagiotis.papastamoulis [at] manchester.ac.uk)
+For direct contact, please contact Panagiotis Papastamoulis (papastamoulis [at] aueb.gr)
